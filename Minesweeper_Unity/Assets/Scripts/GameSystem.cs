@@ -1,17 +1,25 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
+
+public enum Difficulty { _easy, _normal, _difficult }
 
 public class GameSystem : MonoBehaviour
 {
+    [Space, Header("Sizes:")]
     [Range(9, 32)] public int _width = 9;
     [Range(9, 32)] public int _height = 9;
-    private int _mines = 12;
+
+    [Space] public Difficulty _difficulty;
+
+    [Space] public bool _revealAllCells = false;
+
+    private int _mines = 0;
 
     private Board _board;
     private Cell[,] _state;
 
     private bool _gameOver = false;
+    private bool _createdMap = false;
 
     private void Awake()
     {
@@ -21,14 +29,16 @@ public class GameSystem : MonoBehaviour
     private void Start()
     {
         SetNewGame();
+
+        Debug.Log(_mines);
     }
-    /*
+
     private void Update()
     {
-        if (!_gameOver)
+        if (!_gameOver && _createdMap)
         {
-            if (Input.GetMouseButtonUp(0)) RevealCell();
-            if (Input.GetMouseButtonUp(1)) FlagCell();
+            if (Input.GetMouseButtonDown(0)) RevealCell();
+            if (Input.GetMouseButtonDown(1)) FlagCell();
         }
 
         if (Input.GetKeyUp(KeyCode.R))
@@ -36,27 +46,30 @@ public class GameSystem : MonoBehaviour
             _gameOver = false;
             SetNewGame();
         }
-    }*/
+    }
 
     private void SetNewGame()
     {
-
-        _state = new Cell[_width, _height];
-
-        GenerateCells();
+        _gameOver = false;
+        _createdMap = false;
+        GenerateTemporalCells();
         StartCoroutine(GenerateMap());
+    }
 
-        _board.Draw(_state);
-
-        RevealAllCells();
-    } //!
-    
     private IEnumerator GenerateMap()
     {
         yield return new WaitUntil(() => Input.GetMouseButtonUp(0));
 
+        if (_state != null)
+            _state = new Cell[_width, _height];
+
+        GenerateCells();
         GenerateMines();
         SetNumbersInMap();
+
+        _board.Draw(_state);
+
+        _createdMap = true;
     }
 
     private void GenerateCells()
@@ -66,11 +79,22 @@ public class GameSystem : MonoBehaviour
             for (byte y = 0; y < _height; y++)
             {
                 Cell cell = new Cell();
+
                 cell._position = new Vector3Int(x, y, 0);
                 cell._type = Cell.Type._empty;
+
                 _state[x, y] = cell;
+                if (_revealAllCells) _state[x, y]._revealed = true;
             }
         }
+    }
+
+    private void GenerateTemporalCells()
+    {
+        _state = new Cell[_width, _height];
+
+        GenerateCells();
+        _board.Draw(_state);
     }
 
     private void GenerateMines()
@@ -84,22 +108,12 @@ public class GameSystem : MonoBehaviour
 
             while (_state[x, y]._type == Cell.Type._mine)
             {
-                x++;
-                y++;
-
-                if (x > _width || y > _height)
-                {
-                    x = 0;
-                    y = 0;
-
-                    if (x == selectedPosition.x) x += 2;
-                    if (y == selectedPosition.y) x += 2;
-                }
+                x = GenerateSafeSpace(selectedPosition.x, _width);
+                y = GenerateSafeSpace(selectedPosition.y, _height);
             }
 
             _state[x, y]._type = Cell.Type._mine;
         }
-
     }
 
     private void SetNumbersInMap()
@@ -130,35 +144,24 @@ public class GameSystem : MonoBehaviour
 
         switch (cell._type)
         {
-            case Cell.Type._mine: ExplodeCell(cell); 
+            case Cell.Type._mine: Explode(cell);
                 break;
 
             case Cell.Type._empty:
-                FloodCell(cell);
+            case Cell.Type._number:
+                Flood(cell);
                 CheckWinCondition();
                 break;
 
             default:
                 cell._revealed = true;
-                _state[selectedCell.x, selectedCell.y] = cell;
+                _state[cell._position.x, cell._position.y] = cell;
                 CheckWinCondition();
                 break;
         }
-    }
+        
+        _board.Draw(_state);
 
-    private void RevealAllCells()
-    {
-        for (byte x = 0; x < _width; x++)
-        {
-            for (byte y = 0; y < _height; y++)
-            {
-                Cell cell = _state[x, y];
-
-                cell._revealed = true;
-
-                _state[x, y] = cell;
-            }
-        }
     }
 
     private void FlagCell()
@@ -179,10 +182,14 @@ public class GameSystem : MonoBehaviour
         int randomCell = 0;
         maxCellsInRow -= 1;
 
-        if (selectedCell == 0) randomCell = Random.Range(selectedCell + 2, maxCellsInRow);
-        else if (selectedCell == maxCellsInRow) randomCell = Random.Range(0, selectedCell - 2);
-        else if (selectedCell > 0 && selectedCell < maxCellsInRow) randomCell = Random.Range(Random.Range(0, selectedCell - 2), Random.Range(selectedCell + 2, maxCellsInRow));
-        else randomCell = 0;
+        if (selectedCell == 0) randomCell = Random.Range(selectedCell + 1, maxCellsInRow);
+        else if (selectedCell == maxCellsInRow) randomCell = Random.Range(0, selectedCell - 1);
+        else if (selectedCell > 0 && selectedCell < maxCellsInRow)
+        {
+            int downLeft = Random.Range(0, selectedCell - 1);
+            int topRight = Random.Range(selectedCell + 1, maxCellsInRow);
+            randomCell = (Random.Range(0, 10) < 5) ? downLeft : topRight;
+        }
 
 
         return randomCell;
@@ -196,7 +203,9 @@ public class GameSystem : MonoBehaviour
         if (cellPosition.x < 0 || cellPosition.y < 0 || cellPosition.x > _width || cellPosition.y > _height)
         {
             Debug.Log($"Selected position is outside the tilemap > {cellPosition.x}, {cellPosition.y}");
-            return new Vector3Int(0, 0);
+
+            cellPosition = new Vector3Int(Random.Range(0, _width), Random.Range(0, _height), 0);
+            Debug.Log($"New current selected position > {cellPosition.x}, {cellPosition.y}");
         }
 
         return cellPosition;
@@ -235,10 +244,9 @@ public class GameSystem : MonoBehaviour
         return x >= 0 && x < _width && y >= 0 && y < _height;
     }
 
-    private void ExplodeCell(Cell cell)
+    private void Explode(Cell cell)
     {
         Debug.Log("Game over!");
-
         _gameOver = true;
 
         cell._revealed = true;
@@ -266,7 +274,7 @@ public class GameSystem : MonoBehaviour
         }
     }
 
-    private void FloodCell(Cell cell)
+    private void Flood(Cell cell)
     {
         if (cell._revealed) return;
         if (cell._type == Cell.Type._mine || cell._type == Cell.Type._invalid) return;
@@ -276,15 +284,17 @@ public class GameSystem : MonoBehaviour
 
         if (cell._type == Cell.Type._empty || cell._number == 1)
         {
-            FloodCell(GetCell(cell._position.x - 1, cell._position.y));
-            FloodCell(GetCell(cell._position.x + 1, cell._position.y));
-            FloodCell(GetCell(cell._position.x, cell._position.y - 1));
-            FloodCell(GetCell(cell._position.x, cell._position.y + 1));
+            Flood(GetCell(cell._position.x - 1, cell._position.y));
+            Flood(GetCell(cell._position.x + 1, cell._position.y));
+            Flood(GetCell(cell._position.x, cell._position.y - 1));
+            Flood(GetCell(cell._position.x, cell._position.y + 1));
         }
     }
 
     private void CheckWinCondition()
     {
+        if (!_createdMap) return;
+
         for (byte x = 0; x < _width; x++)
         {
             for (byte y = 0; y < _height; y++)
@@ -304,7 +314,7 @@ public class GameSystem : MonoBehaviour
             {
                 Cell cell = _state[x, y];
 
-                if (cell._type != Cell.Type._mine)
+                if (cell._type == Cell.Type._mine)
                 {
                     cell._flagged = true;
                     _state[x, y] = cell;

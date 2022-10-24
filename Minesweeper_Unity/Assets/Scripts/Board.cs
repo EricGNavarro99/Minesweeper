@@ -58,7 +58,7 @@ public class Board : MonoBehaviour
         {
             case Cell.Type._empty: return _empty;
             case Cell.Type._number: return GetNumberTile(cell);
-            case Cell.Type._mine: return _mine;
+            case Cell.Type._mine: return cell._exploded ? _exploded : _mine;
             case Cell.Type._invalid: return null;
             default: return null;
         }
