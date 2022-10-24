@@ -48,9 +48,8 @@ public class Board : MonoBehaviour
     {
         if (cell._revealed) return GetRevealedTile(cell);
         else if (cell._flagged) return _flag;
-        else if (cell._exploded) return _exploded;
         else if (cell._failed) return _failed;
-        else return null;
+        else return _unknown;
     }
 
     private Tile GetRevealedTile(Cell cell)

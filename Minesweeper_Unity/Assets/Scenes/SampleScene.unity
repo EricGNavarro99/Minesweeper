@@ -256,20 +256,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50552e52931324548935ec0907e7a8b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tileEmpty: {fileID: 11400000, guid: 20324e3f218579944b750f695f2fd673, type: 2}
-  _tileUnknown: {fileID: 11400000, guid: 042ce6d34145cad44a79eadc0735270e, type: 2}
-  _tileNum1: {fileID: 11400000, guid: 6b476a0e96b2de14d9a1ed67b7e73da3, type: 2}
-  _tileNum2: {fileID: 11400000, guid: 8cb19901b0118c84aad1862c71abb60f, type: 2}
-  _tileNum3: {fileID: 11400000, guid: b8495e9fe0a85e843a2334aee1797497, type: 2}
-  _tileNum4: {fileID: 11400000, guid: d4a210a0bc555a943b3d36eddd83541b, type: 2}
-  _tileNum5: {fileID: 11400000, guid: cdbc5ae1943c4874eae783b0a6cee343, type: 2}
-  _tileNum6: {fileID: 11400000, guid: aaea214190d58fc4695add095dc95ab5, type: 2}
-  _tileNum7: {fileID: 11400000, guid: 4481be99dc4dadf4d8403838ed361aae, type: 2}
-  _tileNum8: {fileID: 11400000, guid: a0e10c1d32cd25145a01c02d496c7462, type: 2}
-  _tileFlag: {fileID: 11400000, guid: 4c503c31e5de1014099f4f7003788a1f, type: 2}
-  _tileExploded: {fileID: 11400000, guid: 95632151dca15bd46867658cc709df83, type: 2}
-  _tileMine: {fileID: 11400000, guid: f962ce48acd075b49b8413aae53924d5, type: 2}
-  _tileError: {fileID: 11400000, guid: b64077a66587af34bb4732af3808a1b5, type: 2}
+  _empty: {fileID: 11400000, guid: 20324e3f218579944b750f695f2fd673, type: 2}
+  _unknown: {fileID: 11400000, guid: 042ce6d34145cad44a79eadc0735270e, type: 2}
+  _num1: {fileID: 11400000, guid: 6b476a0e96b2de14d9a1ed67b7e73da3, type: 2}
+  _num2: {fileID: 11400000, guid: 8cb19901b0118c84aad1862c71abb60f, type: 2}
+  _num3: {fileID: 11400000, guid: b8495e9fe0a85e843a2334aee1797497, type: 2}
+  _num4: {fileID: 11400000, guid: d4a210a0bc555a943b3d36eddd83541b, type: 2}
+  _num5: {fileID: 11400000, guid: cdbc5ae1943c4874eae783b0a6cee343, type: 2}
+  _num6: {fileID: 11400000, guid: aaea214190d58fc4695add095dc95ab5, type: 2}
+  _num7: {fileID: 11400000, guid: 4481be99dc4dadf4d8403838ed361aae, type: 2}
+  _num8: {fileID: 11400000, guid: a0e10c1d32cd25145a01c02d496c7462, type: 2}
+  _flag: {fileID: 11400000, guid: 4c503c31e5de1014099f4f7003788a1f, type: 2}
+  _exploded: {fileID: 11400000, guid: 95632151dca15bd46867658cc709df83, type: 2}
+  _mine: {fileID: 11400000, guid: f962ce48acd075b49b8413aae53924d5, type: 2}
+  _failed: {fileID: 11400000, guid: b64077a66587af34bb4732af3808a1b5, type: 2}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -281,6 +281,7 @@ GameObject:
   - component: {fileID: 519420032}
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
+  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -354,6 +355,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &519420033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d14ae0d2d5bebd3459c50de4b90c5254, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &806196532
 GameObject:
   m_ObjectHideFlags: 0
@@ -364,6 +377,7 @@ GameObject:
   m_Component:
   - component: {fileID: 806196534}
   - component: {fileID: 806196533}
+  - component: {fileID: 806196535}
   m_Layer: 0
   m_Name: Grid
   m_TagString: Untagged
@@ -399,3 +413,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &806196535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 806196532}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4430cea383c3da419353baf684cc6db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _width: 9
+  _height: 9
+  _mines: 12
