@@ -427,6 +427,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _width: 9
   _height: 9
-  _difficulty: 0
+  _difficulty: 2
   _revealAllCells: 0
-  _mines: 10

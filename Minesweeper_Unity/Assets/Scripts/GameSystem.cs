@@ -15,6 +15,7 @@ public class GameSystem : MonoBehaviour
 
     private int _mines = 0;
 
+
     private Board _board;
     private Cell[,] _state;
 
@@ -28,9 +29,8 @@ public class GameSystem : MonoBehaviour
 
     private void Start()
     {
+        SetDifficulty();
         SetNewGame();
-
-        Debug.Log(_mines);
     }
 
     private void Update()
@@ -321,5 +321,29 @@ public class GameSystem : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void SetDifficulty()
+    {
+        int cellsOnScreen = _width * _height;
+        int minMinesNumber = Mathf.FloorToInt(cellsOnScreen / 10);
+        int maxMinesNumber = Mathf.FloorToInt(cellsOnScreen / 5);
+
+        switch(_difficulty)
+        {
+            case Difficulty._easy:
+                _mines = minMinesNumber;
+                break;
+
+            case Difficulty._normal:
+                _mines = Mathf.Clamp(cellsOnScreen, minMinesNumber, maxMinesNumber);
+                break;                              
+                                                    
+            case Difficulty._difficult:             
+                _mines = maxMinesNumber;
+                break;
+        }
+
+        Debug.Log($"Mines in game > {_mines}");
     }
 }
