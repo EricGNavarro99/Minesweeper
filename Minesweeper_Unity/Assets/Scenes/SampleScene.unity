@@ -425,7 +425,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4430cea383c3da419353baf684cc6db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _width: 9
-  _height: 9
-  _difficulty: 2
+  _width: 24
+  _height: 12
+  _difficulty: 1
   _revealAllCells: 0
