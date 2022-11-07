@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum Difficulty { _easy, _normal, _difficult }
 
@@ -33,18 +34,20 @@ public class GameSystem : MonoBehaviour
         SetNewGame();
     }
 
-    private void Update()
+    private IEnumerator WaitPlayerInput()
     {
-        if (!_gameOver && _createdMap)
+        while (true)
         {
-            if (Input.GetMouseButtonDown(0)) RevealCell();
-            if (Input.GetMouseButtonDown(1)) FlagCell();
-        }
+            Debug.Log("A");
+            yield return new WaitUntil(() => Input.anyKey);
 
-        if (Input.GetKeyUp(KeyCode.R))
-        {
-            _gameOver = false;
-            SetNewGame();
+            if (!_gameOver && _createdMap)
+            {
+                if (Input.GetMouseButtonDown(0)) RevealCell();
+                if (Input.GetMouseButtonDown(1)) FlagCell();
+            }
+
+            if (Input.GetKeyUp(KeyCode.R)) SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
 
@@ -52,7 +55,9 @@ public class GameSystem : MonoBehaviour
     {
         _gameOver = false;
         _createdMap = false;
+
         GenerateTemporalCells();
+
         StartCoroutine(GenerateMap());
     }
 
@@ -60,8 +65,7 @@ public class GameSystem : MonoBehaviour
     {
         yield return new WaitUntil(() => Input.GetMouseButtonUp(0));
 
-        if (_state != null)
-            _state = new Cell[_width, _height];
+        if (_state != null) _state = new Cell[_width, _height];
 
         GenerateCells();
         GenerateMines();
@@ -70,6 +74,8 @@ public class GameSystem : MonoBehaviour
         _board.Draw(_state);
 
         _createdMap = true;
+
+        StartCoroutine(WaitPlayerInput());
     }
 
     private void GenerateCells()
@@ -204,8 +210,11 @@ public class GameSystem : MonoBehaviour
         {
             Debug.Log($"Selected position is outside the tilemap > {cellPosition.x}, {cellPosition.y}");
 
-            cellPosition = new Vector3Int(Random.Range(0, _width), Random.Range(0, _height), 0);
-            Debug.Log($"New current selected position > {cellPosition.x}, {cellPosition.y}");
+            if (!_createdMap)
+            {
+                cellPosition = new Vector3Int(Random.Range(0, _width), Random.Range(0, _height), 0);
+                Debug.Log($"New current selected position > {cellPosition.x}, {cellPosition.y}");
+            }
         }
 
         return cellPosition;
