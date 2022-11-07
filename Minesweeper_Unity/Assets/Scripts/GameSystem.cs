@@ -38,7 +38,6 @@ public class GameSystem : MonoBehaviour
     {
         while (true)
         {
-            Debug.Log("A");
             yield return new WaitUntil(() => Input.anyKey);
 
             if (!_gameOver && _createdMap)
